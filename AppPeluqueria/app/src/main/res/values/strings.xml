@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">AppPeluqueria</string>
+
+    <!-- Login -->
+    <string name="app_title">Peluquería IES Luis Vives</string>
+    <string name="email">Email</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Login</string>
+    <string name="no_account">¿No tienes cuenta?</string>
+    <string name="register_button">REGÍSTRATE</string>
+    <string name="toast_mandatory_fields">Todos los campos son obligatorios</string>
+    <string name="toast_login_failed">Login fallido</string>
+
+    <!-- Register -->
+    <string name="enter_data">Introduce tus datos para registrarte</string>
+    <string name="full_name">Nombre y apellidos</string>
+    <string name="phone">Teléfono</string>
+    <string name="repeat_password">Repetir contraseña</string>
+    <string name="register">Registrarse</string>
+    <string name="yes_account">¿Ya tienes cuenta?</string>
+    <string name="login_button">INICIA SESIÓN</string>
+    <string name="toast_passwords_not_matching">Las contraseñas no coinciden</string>
+    <string name="toast_register_failed">Registro fallido</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

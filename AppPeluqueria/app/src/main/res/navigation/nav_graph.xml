@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="dev.kuromiichi.apppeluqueria.ui.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_serviceFragment"
+            app:destination="@id/serviceFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="dev.kuromiichi.apppeluqueria.ui.fragments.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/serviceFragment"
+        android:name="dev.kuromiichi.apppeluqueria.ui.fragments.ServiceFragment"
+        android:label="fragment_service"
+        tools:layout="@layout/fragment_service" >
+        <action
+            android:id="@+id/action_serviceFragment_to_appointmentFragment"
+            app:destination="@id/appointmentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/appointmentFragment"
+        android:name="dev.kuromiichi.apppeluqueria.ui.fragments.AppointmentFragment"
+        android:label="fragment_appointment"
+        tools:layout="@layout/fragment_appointment" >
+        <action
+            android:id="@+id/action_appointmentFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+</navigation>
