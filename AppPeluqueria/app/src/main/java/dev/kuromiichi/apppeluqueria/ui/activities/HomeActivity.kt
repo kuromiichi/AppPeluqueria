@@ -1,8 +1,10 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -25,6 +27,21 @@ class HomeActivity : AppCompatActivity() {
         val navHost =
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHost.navController
-        binding.navigationView.setupWithNavController(navController)
+        binding.navigationView.apply {
+            setupWithNavController(navController)
+
+            setNavigationItemSelectedListener {
+                if (it.itemId == R.id.signOut) {
+                    auth.signOut()
+                    startActivity(Intent(context, MainActivity::class.java))
+                    true
+                } else {
+                    NavigationUI.onNavDestinationSelected(it, navController)
+                    binding.drawerLayout.close()
+                    true
+                }
+
+            }
+        }
     }
 }
