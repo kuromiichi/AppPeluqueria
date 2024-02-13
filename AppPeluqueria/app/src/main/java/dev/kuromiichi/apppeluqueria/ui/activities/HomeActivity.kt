@@ -3,6 +3,7 @@ package dev.kuromiichi.apppeluqueria.ui.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
@@ -21,7 +22,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setNavigation()
+        setDrawerHeader()
     }
+
 
     private fun setNavigation() {
         val navHost =
@@ -42,6 +45,12 @@ class HomeActivity : AppCompatActivity() {
                 }
 
             }
+        }
+    }
+
+    private fun setDrawerHeader() {
+        binding.navigationView.getHeaderView(0).apply {
+            findViewById<TextView>(R.id.username).text = auth.currentUser?.displayName
         }
     }
 }
