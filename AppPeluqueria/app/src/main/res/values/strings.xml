@@ -24,8 +24,14 @@
     <string name="toast_invalid_phone">El teléfono debe tener 9 caracteres</string>
     <string name="toast_register_failed">Registro fallido</string>
     <string name="toast_invalid_email">El email no es valido</string>
+
+    <!-- Services -->
+    <string name="services">Elija uno o más servicios</string>
+    <string name="toast_no_services_selected">Por favor, seleccione al menos un servicio</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="service_time">Tiempo del Servicio</string>
 
 
 </resources>
