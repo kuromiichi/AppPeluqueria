@@ -63,6 +63,8 @@
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="wrap_content"
+        android:backgroundTint="@color/accent"
+        android:textColor="@color/black"
         android:layout_height="wrap_content"
         android:text="@string/login"
         app:layout_constraintBottom_toTopOf="@id/guidelineBottom"
@@ -93,7 +95,8 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/register_button" />
+            android:text="@string/register_button"
+            android:textColor="@color/accent" />
 
     </LinearLayout>
 
