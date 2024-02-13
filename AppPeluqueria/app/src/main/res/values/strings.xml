@@ -20,9 +20,12 @@
     <string name="yes_account">¿Ya tienes cuenta?</string>
     <string name="login_button">INICIA SESIÓN</string>
     <string name="toast_passwords_not_matching">Las contraseñas no coinciden</string>
+    <string name="toast_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="toast_invalid_phone">El teléfono debe tener 9 caracteres</string>
     <string name="toast_register_failed">Registro fallido</string>
+    <string name="toast_invalid_email">El email no es valido</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="toast_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
+
 
 </resources>
