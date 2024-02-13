@@ -30,36 +30,46 @@ class RegisterActivity : AppCompatActivity() {
             val password = binding.tilPassword.editText?.text.toString()
             val confirmPassword = binding.tilConfirmPassword.editText?.text.toString()
 
-            if (fullName.isBlank()
-                || email.isBlank()
-                || phone.isBlank()
-                || password.isBlank()
-                || confirmPassword.isBlank()
-            ) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.toast_mandatory_fields),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            } else if (password != confirmPassword) {
-                Toast.makeText(
-                    this,
-                    getString(R.string.toast_passwords_not_matching),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-
-            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-                if (it.isSuccessful) {
-                    // add to database
-                    startActivity(Intent(this, MainActivity::class.java))
-                } else Toast.makeText(
-                    this,
-                    getString(R.string.toast_register_failed),
-                    Toast.LENGTH_SHORT
-                ).show()
+            when {
+                fullName.isBlank()
+                    || email.isBlank()
+                    || phone.isBlank()
+                    || password.isBlank()
+                    || confirmPassword.isBlank()
+                -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.toast_mandatory_fields),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                password != confirmPassword -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.toast_passwords_not_matching),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                password.length < 6 -> {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.toast_password_too_short),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+                else -> auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        // TODO: add to database
+                        startActivity(Intent(this, MainActivity::class.java))
+                    } else Toast.makeText(
+                        this,
+                        getString(R.string.toast_register_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
 

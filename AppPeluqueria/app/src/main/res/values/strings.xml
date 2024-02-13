@@ -23,5 +23,6 @@
     <string name="toast_register_failed">Registro fallido</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="toast_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
 
 </resources>
