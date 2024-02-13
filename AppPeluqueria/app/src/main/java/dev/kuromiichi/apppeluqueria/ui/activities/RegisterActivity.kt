@@ -103,7 +103,7 @@ class RegisterActivity : AppCompatActivity() {
                     name = binding.tilName.editText?.text.toString(),
                     email = binding.tilEmail.editText?.text.toString(),
                     phone = binding.tilPhone.editText?.text.toString(),
-                    uuid = auth.currentUser!!.uid,
+                    uid = auth.currentUser!!.uid,
                 )
             )
     }

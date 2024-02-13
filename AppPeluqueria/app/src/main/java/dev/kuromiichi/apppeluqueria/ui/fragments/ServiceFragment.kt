@@ -57,21 +57,6 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
         setListeners()
     }
 
-    private fun setListeners() {
-        binding.fabGoToAppointment.setOnClickListener {
-            if (servicesSelected.isEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.toast_no_services_selected),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else {
-                //TODO Navigate to appointment with selected services as arguments
-            }
-        }
-    }
-
     private fun updateRecycler() {
         // Get services from database with coroutines
         lifecycleScope.launch {
@@ -81,12 +66,24 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
         }
     }
 
+    private fun setListeners() {
+        binding.fabGoToAppointment.setOnClickListener {
+            if (servicesSelected.isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_no_services_selected),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                //TODO Navigate to appointment with selected services as arguments
+            }
+        }
+    }
 
     override fun onServiceClick(service: Service) {
         if (!servicesSelected.contains(service)) {
             servicesSelected.add(service)
-        }
-        else {
+        } else {
             servicesSelected.remove(service)
         }
     }
