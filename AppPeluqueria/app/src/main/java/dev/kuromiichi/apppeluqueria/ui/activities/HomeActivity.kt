@@ -3,17 +3,22 @@ package dev.kuromiichi.apppeluqueria.ui.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.databinding.ActivityHomeBinding
+import dev.kuromiichi.apppeluqueria.models.User
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private val auth by lazy { Firebase.auth }
+    private val db by lazy { Firebase.firestore }
+    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +26,16 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setNavigation()
+        getUser()
+        setDrawerHeader()
     }
+
+    private fun getUser() {
+        user = db.collection("users").document(auth.uid.toString())
+            .get().result?.toObject(User::class.java)
+            ?: User("", "", "", "")
+    }
+
 
     private fun setNavigation() {
         val navHost =
@@ -42,6 +56,13 @@ class HomeActivity : AppCompatActivity() {
                 }
 
             }
+        }
+    }
+
+    private fun setDrawerHeader() {
+        binding.navigationView.getHeaderView(0).apply {
+            findViewById<TextView>(R.id.username).text = user.name
+            findViewById<TextView>(R.id.email).text = user.email
         }
     }
 }
