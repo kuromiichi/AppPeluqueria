@@ -1,14 +1,13 @@
 package dev.kuromiichi.apppeluqueria.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dev.kuromiichi.apppeluqueria.R
@@ -27,7 +26,6 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     private var services: List<Service> = listOf()
     private var servicesSelected = mutableListOf<Service>()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,7 +42,6 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setRecycler()
-
     }
 
     private fun setRecycler() {
@@ -75,7 +72,10 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                //TODO Navigate to appointment with selected services as arguments
+                val action = ServiceFragmentDirections.actionServiceFragmentToAppointmentFragment(
+                    servicesSelected.toTypedArray()
+                )
+                findNavController().navigate(action)
             }
         }
     }
