@@ -31,4 +31,14 @@
     <string name="service_time">Tiempo del servicio</string>
     <string name="service_name">Nombre del servicio</string>
 
+    <!-- Appointments -->
+    <string name="appointments_future">Citas próximas</string>
+    <string name="appointment_datetime">Fecha y hora de la cita</string>
+    <string name="appointment_services">Lista de servicios</string>
+    <string name="appointment_duration">Duración de la cita</string>
+
+    <!-- Others -->
+    <string name="hour">Hora</string>
+    <string name="date_hint">Fecha</string>
+
 </resources>
