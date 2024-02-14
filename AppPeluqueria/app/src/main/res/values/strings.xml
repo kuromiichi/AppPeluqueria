@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">AppPeluqueria</string>
+    <string name="app_title">Peluquería IES Luis Vives</string>
 
     <!-- Login -->
-    <string name="app_title">Peluquería IES Luis Vives</string>
     <string name="email">Email</string>
     <string name="password">Contraseña</string>
     <string name="login">Login</string>
@@ -24,6 +24,7 @@
     <string name="toast_invalid_phone">El teléfono debe tener 9 caracteres</string>
     <string name="toast_register_failed">Registro fallido</string>
     <string name="toast_invalid_email">El email no es válido</string>
+    <string name="toast_register_success">Usuario registrado correctamente</string>
 
     <!-- Services -->
     <string name="services">Elija uno o más servicios</string>

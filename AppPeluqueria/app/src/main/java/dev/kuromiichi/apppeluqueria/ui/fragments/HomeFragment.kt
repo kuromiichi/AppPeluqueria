@@ -1,11 +1,11 @@
 package dev.kuromiichi.apppeluqueria.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -38,13 +38,20 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        clearBackStack()
         setRecycler()
 
-        binding.fabCreateAppointment.setOnClickListener {
+        binding.fabGoToService.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_serviceFragment)
         }
     }
-
+    
+    private fun clearBackStack() {
+        val navController = findNavController()
+        navController.popBackStack(navController.graph.startDestinationId, false)
+    }
+    
     private fun setRecycler() {
         mAdapter = RecyclerAppointmentAdapter(appointments, this)
         binding.rvAppointments.apply {

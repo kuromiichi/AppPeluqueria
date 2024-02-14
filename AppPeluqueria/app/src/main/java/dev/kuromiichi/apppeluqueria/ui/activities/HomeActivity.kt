@@ -1,8 +1,8 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -27,9 +27,23 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setBackButtonBehavior()
         setNavigation()
         getUser()
         setDrawerHeader()
+    }
+
+    private fun setBackButtonBehavior() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.drawerLayout.isDrawerOpen(binding.navigationView)) {
+                    binding.drawerLayout.close()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
     }
 
     private fun setNavigation() {
@@ -42,11 +56,15 @@ class HomeActivity : AppCompatActivity() {
             setNavigationItemSelectedListener {
                 if (it.itemId == R.id.signOut) {
                     auth.signOut()
-                    startActivity(Intent(context, MainActivity::class.java))
+
+                    startActivity(intent)
+                    finish()
+
                     true
                 } else {
                     NavigationUI.onNavDestinationSelected(it, navController)
                     binding.drawerLayout.close()
+
                     true
                 }
 
