@@ -41,5 +41,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
         android:backgroundTint="@color/accent"
-        android:src="@drawable/ic_next" />
+        android:src="@drawable/ic_next"
+        app:tint="@color/black" />
 </FrameLayout>

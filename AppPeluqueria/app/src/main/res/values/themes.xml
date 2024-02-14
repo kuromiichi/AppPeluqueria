@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/regular</item>
+        <item name="android:textColor">@color/text</item>
     </style>
 
     <style name="Theme.AppPeluqueria" parent="Base.Theme.AppPeluqueria" />

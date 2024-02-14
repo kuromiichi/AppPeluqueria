@@ -7,4 +7,5 @@
     <color name="light">#B4B4B4</color>
     <color name="dark">#3C3C3C</color>
     <color name="accent">#FFC107</color>
+    <color name="text">#282828</color>
 </resources>
