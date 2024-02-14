@@ -1,9 +1,9 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
@@ -13,6 +13,8 @@ import com.google.firebase.ktx.Firebase
 import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.databinding.ActivityHomeBinding
 import dev.kuromiichi.apppeluqueria.models.User
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
@@ -29,13 +31,6 @@ class HomeActivity : AppCompatActivity() {
         getUser()
         setDrawerHeader()
     }
-
-    private fun getUser() {
-        user = db.collection("users").document(auth.uid.toString())
-            .get().result?.toObject(User::class.java)
-            ?: User("", "", "", "")
-    }
-
 
     private fun setNavigation() {
         val navHost =
@@ -56,6 +51,14 @@ class HomeActivity : AppCompatActivity() {
                 }
 
             }
+        }
+    }
+
+    private fun getUser() {
+        runBlocking {
+            user = db.collection("users").document(auth.uid.toString())
+                .get().await().toObject(User::class.java)
+                ?: User("", "", "", "")
         }
     }
 
