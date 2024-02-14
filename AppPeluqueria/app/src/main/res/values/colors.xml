@@ -6,6 +6,5 @@
     <color name="regular">#808080</color>
     <color name="light">#B4B4B4</color>
     <color name="dark">#3C3C3C</color>
-    <!-- yellow accent -->
     <color name="accent">#FFC107</color>
 </resources>
