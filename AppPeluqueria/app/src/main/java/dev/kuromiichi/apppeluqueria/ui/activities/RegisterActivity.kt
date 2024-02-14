@@ -1,6 +1,5 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -80,7 +79,14 @@ class RegisterActivity : AppCompatActivity() {
                 else -> auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
                     if (it.isSuccessful) {
                         createUser()
-                        startActivity(Intent(this, MainActivity::class.java))
+
+                        Toast.makeText(
+                            this,
+                            getString(R.string.toast_register_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        finish()
                     } else Toast.makeText(
                         this,
                         getString(R.string.toast_register_failed),
@@ -91,7 +97,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.btnLogin.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 

@@ -1,9 +1,9 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dev.kuromiichi.apppeluqueria.R
@@ -25,7 +25,9 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         if (auth.currentUser != null) {
-            startActivity(Intent(this, HomeActivity::class.java))
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -46,8 +48,8 @@ class MainActivity : AppCompatActivity() {
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
                 if (it.isSuccessful) {
                     startActivity(Intent(this, HomeActivity::class.java))
-                }
-                else Toast.makeText(
+                    finish()
+                } else Toast.makeText(
                     this,
                     getString(R.string.toast_login_failed),
                     Toast.LENGTH_SHORT

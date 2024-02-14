@@ -15,7 +15,8 @@
         <activity
             android:name=".ui.activities.HomeActivity"
             android:exported="false" />
-        <activity android:name=".ui.activities.RegisterActivity"
+        <activity
+            android:name=".ui.activities.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".ui.activities.MainActivity"
