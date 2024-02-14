@@ -55,12 +55,8 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     }
 
     private fun updateRecycler() {
-        // Get services from database with coroutines
-        lifecycleScope.launch {
-            services = db.collection("services").get().await()
-                .toObjects(Service::class.java)
-            mAdapter.setServices(services)
-        }
+        // TODO Get services from database with coroutines
+        // TODO hay una función en el recycler adapter para updatearlo
     }
 
     private fun setListeners() {
