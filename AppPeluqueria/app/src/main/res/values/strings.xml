@@ -38,8 +38,22 @@
     <string name="appointment_services">Lista de servicios</string>
     <string name="appointment_duration">Duración de la cita</string>
 
+    <!-- Profile -->
+    <string name="profile">Perfil</string>
+    <string name="profile_confirm_changes">Confirmar cambios</string>
+    <string name="profile_change_password">Cambiar contraseña</string>
+    <string name="introduce_password">Introduzca la contraseña</string>
+
+    <!-- Change password -->
+    <string name="change_password">Cambio de contraseña</string>
+    <string name="actual_password">Contraseña actual</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="new_password_again">Repita la nueva contraseña</string>
+
     <!-- Others -->
     <string name="hour">Hora</string>
     <string name="date_hint">Fecha</string>
+
+
 
 </resources>
