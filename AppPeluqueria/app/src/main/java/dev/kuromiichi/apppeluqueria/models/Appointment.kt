@@ -1,10 +1,12 @@
 package dev.kuromiichi.apppeluqueria.models
 
 data class Appointment(
-    val userName: String,
-    val userUid: String,
-    val date: String,
-    val time: String,
-    val duration: Int,
-    val services: List<Service>
-    )
+    val id: String = "",
+    val userName: String = "",
+    val userUid: String = "",
+    val date: String = "",
+    val time: String = "",
+    val services: List<Service> = emptyList()
+) {
+    val duration: Int get() = services.sumOf { it.duration }
+}

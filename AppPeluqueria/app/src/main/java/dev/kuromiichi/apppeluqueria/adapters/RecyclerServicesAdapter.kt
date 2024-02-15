@@ -19,7 +19,7 @@ class RecyclerServicesAdapter(
 
         fun bind(service: Service) {
             binding.tvServiceName.text = service.name
-            binding.tvServiceTime.text = service.time + " min"
+            binding.tvServiceTime.text = "${service.duration} min"
         }
 
         fun setListener(service: Service) {
