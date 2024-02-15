@@ -18,8 +18,10 @@ import kotlinx.coroutines.tasks.await
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
+
     private val auth by lazy { Firebase.auth }
     private val db by lazy { Firebase.firestore }
+
     private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -13,6 +13,7 @@ import dev.kuromiichi.apppeluqueria.models.User
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
+
     private val auth: FirebaseAuth by lazy { Firebase.auth }
     private val db by lazy { Firebase.firestore }
 

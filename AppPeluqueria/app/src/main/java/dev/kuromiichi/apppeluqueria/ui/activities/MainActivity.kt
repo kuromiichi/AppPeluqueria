@@ -11,6 +11,7 @@ import dev.kuromiichi.apppeluqueria.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+
     private val auth by lazy { Firebase.auth }
 
     override fun onCreate(savedInstanceState: Bundle?) {

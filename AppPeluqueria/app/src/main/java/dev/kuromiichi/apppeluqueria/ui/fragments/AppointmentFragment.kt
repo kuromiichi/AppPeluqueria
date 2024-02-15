@@ -11,6 +11,7 @@ import dev.kuromiichi.apppeluqueria.databinding.FragmentHomeBinding
 class AppointmentFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
     private val args by navArgs<AppointmentFragmentArgs>()
 
     override fun onCreateView(

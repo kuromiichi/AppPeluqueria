@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dev.kuromiichi.apppeluqueria.R
@@ -15,15 +15,15 @@ import dev.kuromiichi.apppeluqueria.adapters.RecyclerServicesAdapter
 import dev.kuromiichi.apppeluqueria.databinding.FragmentServiceBinding
 import dev.kuromiichi.apppeluqueria.listeners.ServiceOnClickListener
 import dev.kuromiichi.apppeluqueria.models.Service
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class ServiceFragment : Fragment(), ServiceOnClickListener {
     private var _binding: FragmentServiceBinding? = null
     private val binding get() = _binding!!
+
     private val db by lazy { Firebase.firestore }
-    private lateinit var mAdapter: RecyclerServicesAdapter
-    private var services: List<Service> = listOf()
+
+    private lateinit var adapter: RecyclerServicesAdapter
+    private var services = emptyList<Service>()
     private var servicesSelected = mutableListOf<Service>()
 
     override fun onCreateView(
@@ -41,14 +41,15 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setRecycler()
     }
 
     private fun setRecycler() {
-        mAdapter = RecyclerServicesAdapter(services, this)
+        adapter = RecyclerServicesAdapter(services, this)
         binding.rvServices.apply {
-            adapter = mAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            adapter = this@ServiceFragment.adapter
+            layoutManager = LinearLayoutManager(context)
         }
         updateRecycler()
         setListeners()
