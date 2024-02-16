@@ -60,6 +60,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
         android:backgroundTint="@color/accent"
-        android:src="@drawable/ic_check"
+        android:src="@drawable/ic_confirm"
         app:tint="@color/black" />
 </FrameLayout>
