@@ -31,7 +31,7 @@
     <string name="toast_register_success">Usuario registrado correctamente</string>
 
     <!-- Services -->
-    <string name="services">Elija uno o más servicios</string>
+    <string name="services">Elige uno o más servicios</string>
     <string name="toast_no_services_selected">Por favor, seleccione al menos un servicio</string>
     <string name="service_time">Tiempo del servicio</string>
     <string name="service_name">Nombre del servicio</string>
@@ -54,13 +54,18 @@
     <string name="profile">Perfil</string>
     <string name="profile_confirm_changes">Confirmar cambios</string>
     <string name="profile_change_password">Cambiar contraseña</string>
-    <string name="introduce_password">Introduzca la contraseña</string>
+    <string name="introduce_password">Introduce la contraseña</string>
+    <string name="profile_change_fields">Cambia al menos un campo para actualizar su perfil</string>
+    <string name="profile_updated">Perfil actualizado</string>
+    <string name="toast_wrong_password">La contraseña es incorrecta</string>
 
     <!-- Change password -->
     <string name="change_password">Cambio de contraseña</string>
     <string name="actual_password">Contraseña actual</string>
     <string name="new_password">Nueva contraseña</string>
-    <string name="new_password_again">Repita la nueva contraseña</string>
+    <string name="new_password_again">Repetir la nueva contraseña</string>
+    <string name="toast_passwords_dont_match">Los campos de contraseña nueva no coinciden</string>
+    <string name="toast_password_changed">Contraseña cambiada</string>
 
     <!-- Others -->
     <string name="hour">Hora</string>
