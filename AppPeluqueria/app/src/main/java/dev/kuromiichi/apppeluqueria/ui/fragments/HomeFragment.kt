@@ -64,11 +64,19 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
     }
 
     private fun updateRecycler() {
-        // TODO Get appointments from database with coroutines,
-        // TODO hay una función en el recycler adapter para updatearlo
+        db.collection("appointments").get().addOnSuccessListener { result ->
+            val appointments = result.toObjects(Appointment::class.java)
+            adapter.setAppointments(appointments)
+        }
     }
 
     override fun onAppointmentClick(appointment: Appointment) {
-        //TODO Dialogo para eliminar la cita
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle(R.string.dialog_cancel_appointment_title)
+            setMessage(R.string.dialog_cancel_appointment_message)
+            setPositiveButton(R.string.dialog_yes) { _, _ ->
+                db.collection("appointments").document(appointment.id).delete()
+            }
+        }
     }
 }

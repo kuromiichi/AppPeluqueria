@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Service(
+    val id: String = "",
     val name: String = "",
     val duration: Int = 0
 ) : Parcelable

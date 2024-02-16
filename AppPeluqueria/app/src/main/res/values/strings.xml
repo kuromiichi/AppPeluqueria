@@ -2,6 +2,10 @@
     <string name="app_name">AppPeluqueria</string>
     <string name="app_title">Peluquería IES Luis Vives</string>
 
+    <!-- Common -->
+    <string name="dialog_yes">Sí</string>
+    <string name="dialog_no">No</string>
+
     <!-- Login -->
     <string name="email">Email</string>
     <string name="password">Contraseña</string>
@@ -37,6 +41,14 @@
     <string name="appointment_datetime">Fecha y hora de la cita</string>
     <string name="appointment_services">Lista de servicios</string>
     <string name="appointment_duration">Duración de la cita</string>
+    <string name="dialog_cancel_appointment_title">Cancelar cita</string>
+    <string name="dialog_cancel_appointment_message">¿Seguro que quieres cancelar esta cita?</string>
+    <string name="toast_cancel_appointment_success">Cita cancelada correctamente</string>
+    <string name="toast_cancel_appointment_failed">Error al cancelar la cita</string>
+    <string name="dialog_confirm_appointment_title">Confirmar cita</string>
+    <string name="dialog_confirm_appointment_message">¿Quieres crear esta cita?</string>
+    <string name="toast_confirm_appointment_success">Cita creada correctamente</string>
+    <string name="toast_confirm_appointment_failed">Error al crear la cita</string>
 
     <!-- Profile -->
     <string name="profile">Perfil</string>
@@ -53,7 +65,8 @@
     <!-- Others -->
     <string name="hour">Hora</string>
     <string name="date_hint">Fecha</string>
-
+    <string name="toast_no_hour_selected">No hay ninguna hora seleccionada</string>
+    <string name="choose_date">Elige una fecha</string>
 
 
 </resources>

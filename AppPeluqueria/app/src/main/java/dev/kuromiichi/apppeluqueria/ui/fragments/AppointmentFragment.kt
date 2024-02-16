@@ -1,23 +1,34 @@
 package dev.kuromiichi.apppeluqueria.ui.fragments
 
-import android.app.DatePickerDialog
+import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Parcel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.adapters.RecyclerHoursAdapter
 import dev.kuromiichi.apppeluqueria.databinding.FragmentAppointmentBinding
 import dev.kuromiichi.apppeluqueria.listeners.HourOnClickListener
+import dev.kuromiichi.apppeluqueria.models.Appointment
 import dev.kuromiichi.apppeluqueria.models.Service
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.MINUTE
+import java.util.Date
 import java.util.Locale
 
 class AppointmentFragment : Fragment(), HourOnClickListener {
@@ -33,10 +44,12 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
     private lateinit var adapter: RecyclerHoursAdapter
 
     private var date = ""
-    private var hours = emptyList<String>()
-    private var limitHours = emptyList<String>()
+    private var openDays = BooleanArray(7)
+    private var availableHours = emptyList<String>()
+    private var openingTime: Date? = null
+    private var closingTime: Date? = null
+    private var maxAppointments = 0
     private var selectedHour = ""
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,45 +66,116 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         services = args.services.toList()
         setRecycler()
-        setListeners()
+        setButtons()
     }
 
     private fun setRecycler() {
-        adapter = RecyclerHoursAdapter(hours, this)
+        adapter = RecyclerHoursAdapter(availableHours, this)
         binding.rvHours.apply {
             adapter = this@AppointmentFragment.adapter
             layoutManager = GridLayoutManager(context, 4)
         }
-        getLimitHours()
-        setHoursList()
+        getSettings()
+        setAvailableHours()
         updateRecycler()
     }
 
     private fun updateRecycler() {
-        // TODO Con las horas disponibles, actualiza el recycler
+        adapter.setHours(availableHours)
     }
 
-    private fun setHoursList() {
-        // TODO Con las horas de la pelu, crea una lista de horas posibles
-        // TODO Ten en cuenta que las horas no aparezcan
-        // TODO si ya hay máximo de reservas en la duracion de la cita
+    private fun getSettings() {
+        db.collection("settings").document("settings").get()
+            .addOnSuccessListener { result ->
+                result.data?.let {
+                    openDays = it["open_days"] as BooleanArray
+                    openingTime = SimpleDateFormat(
+                        "HH:mm",
+                        Locale.getDefault()
+                    ).parse(it["opening_time"].toString())
+                    closingTime = SimpleDateFormat(
+                        "HH:mm",
+                        Locale.getDefault()
+                    ).parse(it["closing_time"].toString())
+                    maxAppointments = it["max_appointments"].toString().toInt()
+                }
+            }
     }
 
-    private fun getLimitHours() {
-        // TODO Coge las horas de abridura y cerradura de la pelu
+    private fun setAvailableHours() {
+        // TODO: Quitar las horas antes de ahora xd
+        if (openingTime == null || closingTime == null) return
+
+        val calendarOpening = Calendar.getInstance().apply { time = openingTime!! }
+        val calendarClosing = Calendar.getInstance().apply { time = closingTime!! }
+
+        // Ajustar inicio y fin de horas disponibles
+        when (calendarOpening[MINUTE]) {
+            in 1..30 -> calendarOpening[MINUTE] = 30
+            in 31..59 -> {
+                calendarOpening[HOUR_OF_DAY] += 1
+                calendarOpening[MINUTE] = 0
+            }
+        }
+        calendarClosing.add(MINUTE, -30)
+
+        // Crear lista de horas disponibles sin filtrar
+        val possibleHours = mutableListOf<Date>()
+        while (calendarOpening.time < calendarClosing.time) {
+            possibleHours.add(calendarOpening.time)
+            calendarOpening.add(MINUTE, 30)
+        }
+
+        // Quitar las horas posibles que ya estén reservadas
+        var occupiedHours = emptyList<Date>()
+        db.collection("appointments").get().addOnSuccessListener { result ->
+            occupiedHours = result.toObjects(Appointment::class.java)
+                .filter { it.date == date }
+                .groupBy { it.time }
+                .mapValues { it.value.size }
+                .filter { it.value >= maxAppointments }
+                .keys
+                .map { SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it)!! }
+
+            occupiedHours.forEach { possibleHours.remove(it) }
+        }
+
+        // Quitar las horas sin suficiente tiempo disponible
+        possibleHours.removeIf { hour ->
+            getFreeMinutes(hour, occupiedHours) < services.sumOf { it.duration }
+        }
+
+        availableHours = possibleHours
+            .map { SimpleDateFormat("HH:mm", Locale.getDefault()).format(it) }
     }
 
-    override fun onHourClick(hour: String) {
-        selectedHour = hour
-        // TODO Se puede cambiar el color del item si está seleccionado?
+    private fun getFreeMinutes(date: Date, occupiedHours: List<Date>): Int {
+        val firstOccupied = occupiedHours.firstOrNull { it.after(date) } ?: closingTime
+
+        return ((firstOccupied!!.time - date.time) / 1000 / 60).toInt()
     }
 
-    private fun setListeners() {
+    private fun setButtons() {
         binding.fabConfirmAppointment.setOnClickListener {
-            // TODO Dialogo para confirmar la cita, y luego la cosa esa
-            // TODO para que no se pueda volver atras despues de confirmar e ir al home fragment
+            if (selectedHour == "") {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_no_hour_selected),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            AlertDialog.Builder(requireContext()).apply {
+                setTitle(R.string.dialog_confirm_appointment_title)
+                setMessage(R.string.dialog_confirm_appointment_message)
+                setPositiveButton(R.string.dialog_yes) { _, _ ->
+                    confirmAppointment()
+                }
+                setNegativeButton(R.string.dialog_no) { _, _ -> }
+            }
         }
 
         binding.imageButtonCalendar.setOnClickListener {
@@ -99,22 +183,76 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         }
     }
 
-    private fun datePickerDialog(textInput: EditText) {
-        val calendar = Calendar.getInstance()
-        DatePickerDialog(
-            requireContext(),
-            { _, year, month, day ->
-                calendar.set(year, month, day)
-                textInput.setText(
-                    SimpleDateFormat(
-                        "dd/MM/yyyy",
-                        Locale.getDefault()
-                    ).format(calendar.time)
-                )
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
+    private fun confirmAppointment() {
+        db.collection("appointments").add(
+            Appointment(
+                userUid = auth.uid.toString(),
+                date = date,
+                time = selectedHour,
+                services = services
+            )
+        ).addOnSuccessListener { result ->
+            db.collection("appointments").document(result.id)
+                .update("id", result.id).addOnSuccessListener {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.toast_confirm_appointment_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    findNavController().navigate(R.id.homeFragment)
+                }.addOnFailureListener {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.toast_confirm_appointment_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    db.collection("appointments").document(result.id).delete()
+                }
+        }.addOnFailureListener {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.toast_confirm_appointment_failed),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun datePickerDialog(editText: EditText) {
+        val today = MaterialDatePicker.todayInUtcMilliseconds()
+        val thisMonth = MaterialDatePicker.thisMonthInUtcMilliseconds()
+
+        val dayOfWeekValidator = object : DateValidator {
+            override fun describeContents(): Int = 0
+
+            override fun writeToParcel(dest: Parcel, flags: Int) {}
+
+            override fun isValid(date: Long): Boolean {
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = date
+
+                return openDays[calendar[Calendar.DAY_OF_WEEK] - 1]
+            }
+        }
+
+        val dialog = MaterialDatePicker.Builder
+            .datePicker()
+            .setTitleText(getString(R.string.choose_date))
+            .setCalendarConstraints(
+                CalendarConstraints.Builder()
+                    .setOpenAt(thisMonth)
+                    .setStart(today)
+                    .setValidator(dayOfWeekValidator)
+                    .setFirstDayOfWeek(Calendar.MONDAY)
+                    .build()
+            ).build()
+        dialog.show(requireActivity().supportFragmentManager, "DATE_PICKER")
+
+        dialog.addOnPositiveButtonClickListener {
+            editText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it))
+        }
+    }
+
+    override fun onHourClick(hour: String) {
+        selectedHour = hour
     }
 }

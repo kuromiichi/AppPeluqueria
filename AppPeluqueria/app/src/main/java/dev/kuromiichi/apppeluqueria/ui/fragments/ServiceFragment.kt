@@ -24,7 +24,7 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
 
     private lateinit var adapter: RecyclerServicesAdapter
     private var services = emptyList<Service>()
-    private var servicesSelected = mutableListOf<Service>()
+    private var selectedServices = mutableSetOf<Service>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,13 +56,15 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     }
 
     private fun updateRecycler() {
-        // TODO Get services from database with coroutines
-        // TODO hay una función en el recycler adapter para updatearlo
+        db.collection("services").get().addOnSuccessListener { result ->
+            services = result.toObjects(Service::class.java)
+            adapter.setServices(services)
+        }
     }
 
     private fun setListeners() {
         binding.fabGoToAppointment.setOnClickListener {
-            if (servicesSelected.isEmpty()) {
+            if (selectedServices.isEmpty()) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.toast_no_services_selected),
@@ -70,7 +72,7 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
                 ).show()
             } else {
                 val action = ServiceFragmentDirections.actionServiceFragmentToAppointmentFragment(
-                    servicesSelected.toTypedArray()
+                    selectedServices.toTypedArray()
                 )
                 findNavController().navigate(action)
             }
@@ -78,10 +80,10 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     }
 
     override fun onServiceClick(service: Service) {
-        if (!servicesSelected.contains(service)) {
-            servicesSelected.add(service)
+        if (service in selectedServices) {
+            selectedServices.remove(service)
         } else {
-            servicesSelected.remove(service)
+            selectedServices.add(service)
         }
     }
 }

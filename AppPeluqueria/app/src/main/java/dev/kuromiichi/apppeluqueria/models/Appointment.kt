@@ -2,7 +2,6 @@ package dev.kuromiichi.apppeluqueria.models
 
 data class Appointment(
     val id: String = "",
-    val userName: String = "",
     val userUid: String = "",
     val date: String = "",
     val time: String = "",
