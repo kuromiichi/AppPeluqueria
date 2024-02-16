@@ -41,4 +41,9 @@
             app:argType="dev.kuromiichi.apppeluqueria.models.Service[]" />
 
     </fragment>
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="dev.kuromiichi.apppeluqueria.ui.fragments.ChangePasswordFragment"
+        android:label="fragment_change_password"
+        tools:layout="@layout/fragment_change_password" />
 </navigation>
