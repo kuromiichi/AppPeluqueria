@@ -68,23 +68,9 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         services = args.services.toList()
+        getSettings()
         setRecycler()
         setButtons()
-    }
-
-    private fun setRecycler() {
-        adapter = RecyclerHoursAdapter(availableHours, this)
-        binding.rvHours.apply {
-            adapter = this@AppointmentFragment.adapter
-            layoutManager = GridLayoutManager(context, 4)
-        }
-        getSettings()
-        setAvailableHours()
-        updateRecycler()
-    }
-
-    private fun updateRecycler() {
-        adapter.setHours(availableHours)
     }
 
     private fun getSettings() {
@@ -102,60 +88,22 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
                     ).parse(it["closing_time"].toString())
                     maxAppointments = it["max_appointments"].toString().toInt()
                 }
+            }.addOnFailureListener {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.toast_settings_error),
+                    Toast.LENGTH_SHORT
+                ).show()
+                findNavController().navigate(R.id.action_appointmentFragment_to_homeFragment)
             }
     }
 
-    private fun setAvailableHours() {
-        // TODO: Quitar las horas antes de ahora xd
-        if (openingTime == null || closingTime == null) return
-
-        val calendarOpening = Calendar.getInstance().apply { time = openingTime!! }
-        val calendarClosing = Calendar.getInstance().apply { time = closingTime!! }
-
-        // Ajustar inicio y fin de horas disponibles
-        when (calendarOpening[MINUTE]) {
-            in 1..30 -> calendarOpening[MINUTE] = 30
-            in 31..59 -> {
-                calendarOpening[HOUR_OF_DAY] += 1
-                calendarOpening[MINUTE] = 0
-            }
+    private fun setRecycler() {
+        adapter = RecyclerHoursAdapter(availableHours, this)
+        binding.rvHours.apply {
+            adapter = this@AppointmentFragment.adapter
+            layoutManager = GridLayoutManager(context, 4)
         }
-        calendarClosing.add(MINUTE, -30)
-
-        // Crear lista de horas disponibles sin filtrar
-        val possibleHours = mutableListOf<Date>()
-        while (calendarOpening.time < calendarClosing.time) {
-            possibleHours.add(calendarOpening.time)
-            calendarOpening.add(MINUTE, 30)
-        }
-
-        // Quitar las horas posibles que ya estén reservadas
-        var occupiedHours = emptyList<Date>()
-        db.collection("appointments").get().addOnSuccessListener { result ->
-            occupiedHours = result.toObjects(Appointment::class.java)
-                .filter { it.date == date }
-                .groupBy { it.time }
-                .mapValues { it.value.size }
-                .filter { it.value >= maxAppointments }
-                .keys
-                .map { SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it)!! }
-
-            occupiedHours.forEach { possibleHours.remove(it) }
-        }
-
-        // Quitar las horas sin suficiente tiempo disponible
-        possibleHours.removeIf { hour ->
-            getFreeMinutes(hour, occupiedHours) < services.sumOf { it.duration }
-        }
-
-        availableHours = possibleHours
-            .map { SimpleDateFormat("HH:mm", Locale.getDefault()).format(it) }
-    }
-
-    private fun getFreeMinutes(date: Date, occupiedHours: List<Date>): Int {
-        val firstOccupied = occupiedHours.firstOrNull { it.after(date) } ?: closingTime
-
-        return ((firstOccupied!!.time - date.time) / 1000 / 60).toInt()
     }
 
     private fun setButtons() {
@@ -199,7 +147,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
                         getString(R.string.toast_confirm_appointment_success),
                         Toast.LENGTH_SHORT
                     ).show()
-                    findNavController().navigate(R.id.homeFragment)
+                    findNavController().navigate(R.id.action_appointmentFragment_to_homeFragment)
                 }.addOnFailureListener {
                     Toast.makeText(
                         requireContext(),
@@ -234,8 +182,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
             }
         }
 
-        val dialog = MaterialDatePicker.Builder
-            .datePicker()
+        val dialog = MaterialDatePicker.Builder.datePicker()
             .setTitleText(getString(R.string.choose_date))
             .setCalendarConstraints(
                 CalendarConstraints.Builder()
@@ -248,8 +195,72 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         dialog.show(requireActivity().supportFragmentManager, "DATE_PICKER")
 
         dialog.addOnPositiveButtonClickListener {
-            editText.setText(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it))
+            date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
+            editText.setText(date)
+            setAvailableHours()
+            updateRecycler()
         }
+    }
+
+    private fun setAvailableHours() {
+        if (openingTime == null || closingTime == null) return
+
+        val calendarOpening = Calendar.getInstance().apply { time = openingTime!! }
+        val calendarClosing = Calendar.getInstance().apply { time = closingTime!! }
+
+        // Ajustar inicio y fin de horas disponibles
+        when (calendarOpening[MINUTE]) {
+            in 1..30 -> calendarOpening[MINUTE] = 30
+            in 31..59 -> {
+                calendarOpening[HOUR_OF_DAY] += 1
+                calendarOpening[MINUTE] = 0
+            }
+        }
+        calendarClosing.add(MINUTE, -30)
+
+        // Crear lista de horas disponibles sin filtrar
+        val possibleHours = mutableListOf<Date>()
+        while (calendarOpening.time < calendarClosing.time) {
+            possibleHours.add(calendarOpening.time)
+            calendarOpening.add(MINUTE, 30)
+        }
+
+        // Si la fecha ya ha pasado, no mostrar horas anteriores
+        possibleHours.removeIf { hour ->
+            hour.before(Calendar.getInstance().time)
+        }
+
+        // Quitar las horas posibles que ya estén reservadas
+        var occupiedHours = emptyList<Date>()
+        db.collection("appointments").get().addOnSuccessListener { result ->
+            occupiedHours = result.toObjects(Appointment::class.java)
+                .filter { it.date == date }
+                .groupBy { it.time }
+                .mapValues { it.value.size }
+                .filter { it.value >= maxAppointments }
+                .keys
+                .map { SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it)!! }
+
+            occupiedHours.forEach { possibleHours.remove(it) }
+        }
+
+        // Quitar las horas sin suficiente tiempo disponible
+        possibleHours.removeIf { hour ->
+            getFreeMinutes(hour, occupiedHours) < services.sumOf { it.duration }
+        }
+
+        availableHours = possibleHours
+            .map { SimpleDateFormat("HH:mm", Locale.getDefault()).format(it) }
+    }
+
+    private fun getFreeMinutes(date: Date, occupiedHours: List<Date>): Int {
+        val firstOccupied = occupiedHours.firstOrNull { it.after(date) } ?: closingTime
+
+        return ((firstOccupied!!.time - date.time) / 1000 / 60).toInt()
+    }
+
+    private fun updateRecycler() {
+        adapter.setHours(availableHours)
     }
 
     override fun onHourClick(hour: String) {
