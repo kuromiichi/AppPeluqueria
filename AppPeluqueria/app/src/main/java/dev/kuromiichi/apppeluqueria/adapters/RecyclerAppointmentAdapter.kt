@@ -8,6 +8,9 @@ import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.databinding.ItemAppointmentBinding
 import dev.kuromiichi.apppeluqueria.listeners.AppointmentOnClickListener
 import dev.kuromiichi.apppeluqueria.models.Appointment
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class RecyclerAppointmentAdapter(
     private var appointments: List<Appointment>,
@@ -22,7 +25,9 @@ class RecyclerAppointmentAdapter(
             appointment.services.forEach {
                 binding.tvAppointmentServices.append(it.name + "\n")
             }
-            binding.tvAppointmentDateTime.text = appointment.date + " " + appointment.time
+            binding.tvAppointmentDateTime.text =
+                SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    .format(Date(appointment.date.time + appointment.time.time))
             binding.tvAppointmentDuration.text = appointment.duration.toString() + " min"
         }
 

@@ -43,13 +43,13 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
     private lateinit var adapter: RecyclerHoursAdapter
 
-    private var date = ""
+    private var selectedDate: Date? = null
+    private var selectedHour: Date? = null
     private var openDays = BooleanArray(7)
     private var availableHours = emptyList<String>()
     private var openingTime: Date? = null
     private var closingTime: Date? = null
     private var maxAppointments = 0
-    private var selectedHour = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,7 +108,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
     private fun setButtons() {
         binding.fabConfirmAppointment.setOnClickListener {
-            if (selectedHour == "") {
+            if (selectedHour == null) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.toast_no_hour_selected),
@@ -135,8 +135,8 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         db.collection("appointments").add(
             Appointment(
                 userUid = auth.uid.toString(),
-                date = date,
-                time = selectedHour,
+                date = selectedDate!!,
+                time = selectedHour!!,
                 services = services
             )
         ).addOnSuccessListener { result ->
@@ -195,8 +195,16 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         dialog.show(requireActivity().supportFragmentManager, "DATE_PICKER")
 
         dialog.addOnPositiveButtonClickListener {
-            date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it)
-            editText.setText(date)
+            if (dialog.selection == null) return@addOnPositiveButtonClickListener
+
+            selectedDate = Date(dialog.selection!!)
+            editText.setText(
+                SimpleDateFormat(
+                    "dd/MM/yyyy",
+                    Locale.getDefault()
+                ).format(selectedDate!!)
+            )
+
             setAvailableHours()
             updateRecycler()
         }
@@ -234,12 +242,11 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         var occupiedHours = emptyList<Date>()
         db.collection("appointments").get().addOnSuccessListener { result ->
             occupiedHours = result.toObjects(Appointment::class.java)
-                .filter { it.date == date }
+                .filter { it.date == selectedDate }
                 .groupBy { it.time }
                 .mapValues { it.value.size }
                 .filter { it.value >= maxAppointments }
-                .keys
-                .map { SimpleDateFormat("HH:mm", Locale.getDefault()).parse(it)!! }
+                .keys.toList()
 
             occupiedHours.forEach { possibleHours.remove(it) }
         }
@@ -264,6 +271,6 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
     }
 
     override fun onHourClick(hour: String) {
-        selectedHour = hour
+        selectedHour = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(hour)
     }
 }
