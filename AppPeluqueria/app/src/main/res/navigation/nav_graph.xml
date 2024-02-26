@@ -37,7 +37,8 @@
         <action
             android:id="@+id/action_appointmentFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
-        <argument android:name="services"
+        <argument
+            android:name="services"
             app:argType="dev.kuromiichi.apppeluqueria.models.Service[]" />
 
     </fragment>
@@ -45,5 +46,10 @@
         android:id="@+id/changePasswordFragment"
         android:name="dev.kuromiichi.apppeluqueria.ui.fragments.ChangePasswordFragment"
         android:label="fragment_change_password"
-        tools:layout="@layout/fragment_change_password" />
+        tools:layout="@layout/fragment_change_password">
+        <action
+            android:id="@+id/action_changePasswordFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:popUpTo="@id/profileFragment" />
+    </fragment>
 </navigation>

@@ -1,11 +1,11 @@
 package dev.kuromiichi.apppeluqueria.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
@@ -15,6 +15,9 @@ import com.google.firebase.firestore.firestore
 import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.databinding.FragmentProfileBinding
 import dev.kuromiichi.apppeluqueria.models.User
+import dev.kuromiichi.apppeluqueria.ui.activities.HomeActivity
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
@@ -25,8 +28,7 @@ class ProfileFragment : Fragment() {
     private lateinit var user: User
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
@@ -39,25 +41,21 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUser()
+        runBlocking {
+            user = setUser()
+        }
         setButtons()
         setTexts()
     }
 
-    private fun setUser() {
-        db.collection("users")
-            .document(auth.uid.toString())
-            .get()
-            .addOnSuccessListener {
-                user = it.toObject(User::class.java)!!
-            }
+    private suspend fun setUser(): User {
+        return db.collection("users").document(auth.uid.toString()).get().await()
+            .toObject(User::class.java)!!
     }
-
 
     private fun setButtons() {
         binding.buttonChangePassword.setOnClickListener {
-            findNavController()
-                .navigate(R.id.changePasswordFragment)
+            findNavController().navigate(R.id.changePasswordFragment)
         }
 
         binding.buttonUpdate.setOnClickListener {
@@ -66,7 +64,13 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateUser() {
-        val credentials: AuthCredential = EmailAuthProvider.getCredential(
+        if (binding.tilPassword.editText?.text.toString().isBlank()) {
+            Toast.makeText(
+                this.context, getString(R.string.toast_mandatory_fields), Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        val credentials = EmailAuthProvider.getCredential(
             user.email, binding.tilPassword.editText?.text.toString()
         )
 
@@ -75,9 +79,7 @@ class ProfileFragment : Fragment() {
             && user.phone == binding.tilPhone.editText?.text.toString()
         ) {
             Toast.makeText(
-                this.context,
-                getString(R.string.profile_change_fields),
-                Toast.LENGTH_SHORT
+                this.context, getString(R.string.profile_change_fields), Toast.LENGTH_SHORT
             ).show()
             return
         }
@@ -86,13 +88,10 @@ class ProfileFragment : Fragment() {
             auth.currentUser?.reauthenticate(credentials)?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     updateUserData()
-                    auth.currentUser
-                        ?.verifyBeforeUpdateEmail(binding.tilEmail.editText?.text.toString())
+                    auth.currentUser?.verifyBeforeUpdateEmail(binding.tilEmail.editText?.text.toString())
                 } else {
                     Toast.makeText(
-                        this.context,
-                        getString(R.string.toast_wrong_password),
-                        Toast.LENGTH_SHORT
+                        this.context, getString(R.string.toast_wrong_password), Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -102,9 +101,7 @@ class ProfileFragment : Fragment() {
                     updateUserData()
                 } else {
                     Toast.makeText(
-                        this.context,
-                        getString(R.string.toast_wrong_password),
-                        Toast.LENGTH_SHORT
+                        this.context, getString(R.string.toast_wrong_password), Toast.LENGTH_SHORT
                     ).show()
                 }
             }
@@ -112,20 +109,19 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateUserData() {
-        db.collection("users")
-            .document(auth.uid.toString())
-            .update(
-                "email", binding.tilEmail.editText?.text.toString(),
-                "name", binding.tilName.editText?.text.toString(),
-                "phone", binding.tilPhone.editText?.text.toString()
-            )
-            .addOnSuccessListener {
-                Toast.makeText(
-                    this.context,
-                    getString(R.string.profile_updated),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        db.collection("users").document(auth.uid.toString()).update(
+            "email",
+            binding.tilEmail.editText?.text.toString(),
+            "name",
+            binding.tilName.editText?.text.toString(),
+            "phone",
+            binding.tilPhone.editText?.text.toString()
+        ).addOnSuccessListener {
+            Toast.makeText(
+                this.context, getString(R.string.profile_updated), Toast.LENGTH_SHORT
+            ).show()
+            (activity as HomeActivity).updateDrawerHeader()
+        }
     }
 
     private fun setTexts() {

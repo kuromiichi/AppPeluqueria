@@ -73,6 +73,7 @@
     <string name="toast_no_hour_selected">No hay ninguna hora seleccionada</string>
     <string name="choose_date">Elige una fecha</string>
     <string name="toast_settings_error">Ha ocurrido un error al recuperar los parámetros de la aplicación</string>
+    <string name="toast_password_change_failed">No se ha podido actualizar la contraseña</string>
 
 
 </resources>

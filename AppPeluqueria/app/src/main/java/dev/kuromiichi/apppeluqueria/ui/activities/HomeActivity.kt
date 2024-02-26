@@ -1,5 +1,6 @@
 package dev.kuromiichi.apppeluqueria.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -31,7 +32,7 @@ class HomeActivity : AppCompatActivity() {
 
         setBackButtonBehavior()
         setNavigation()
-        getUser()
+        runBlocking { getUser() }
         setDrawerHeader()
     }
 
@@ -59,6 +60,7 @@ class HomeActivity : AppCompatActivity() {
                 if (it.itemId == R.id.signOut) {
                     auth.signOut()
 
+                    val intent = Intent(this@HomeActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
 
@@ -74,12 +76,10 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun getUser() {
-        runBlocking {
-            user = db.collection("users").document(auth.uid.toString())
-                .get().await().toObject(User::class.java)
-                ?: User("", "", "", "")
-        }
+    private suspend fun getUser() {
+        user = db.collection("users").document(auth.uid.toString())
+            .get().await().toObject(User::class.java)
+            ?: User("", "", "", "")
     }
 
     private fun setDrawerHeader() {
@@ -87,5 +87,10 @@ class HomeActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.username).text = user.name
             findViewById<TextView>(R.id.email).text = user.email
         }
+    }
+
+    fun updateDrawerHeader() {
+        runBlocking { getUser() }
+        setDrawerHeader()
     }
 }
