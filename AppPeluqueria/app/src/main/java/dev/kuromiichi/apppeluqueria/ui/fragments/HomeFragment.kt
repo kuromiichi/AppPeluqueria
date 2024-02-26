@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import dev.kuromiichi.apppeluqueria.R
 import dev.kuromiichi.apppeluqueria.adapters.RecyclerAppointmentAdapter
@@ -21,9 +22,11 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
     private val binding get() = _binding!!
 
     private val db by lazy { Firebase.firestore }
+    private val auth by lazy { Firebase.auth }
 
     private lateinit var adapter: RecyclerAppointmentAdapter
     private var appointments = emptyList<Appointment>()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +67,13 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
     }
 
     private fun updateRecycler() {
-        db.collection("appointments").get().addOnSuccessListener { result ->
-            val appointments = result.toObjects(Appointment::class.java)
-            adapter.setAppointments(appointments)
-        }
+        db.collection("appointments").whereEqualTo(
+            "userUid", auth.currentUser?.uid
+        ).get()
+            .addOnSuccessListener { result ->
+                val appointments = result.toObjects(Appointment::class.java)
+                adapter.setAppointments(appointments)
+            }
     }
 
     override fun onAppointmentClick(appointment: Appointment) {
@@ -76,6 +82,7 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
             setMessage(R.string.dialog_cancel_appointment_message)
             setPositiveButton(R.string.dialog_yes) { _, _ ->
                 db.collection("appointments").document(appointment.id).delete()
+                updateRecycler()
             }
         }.show()
     }
