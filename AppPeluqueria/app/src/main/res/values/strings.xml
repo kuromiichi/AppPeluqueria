@@ -49,6 +49,7 @@
     <string name="dialog_confirm_appointment_message">¿Quieres crear esta cita?</string>
     <string name="toast_confirm_appointment_success">Cita creada correctamente</string>
     <string name="toast_confirm_appointment_failed">Error al crear la cita</string>
+    <string name="hour_selected">Hora Seleccionada</string>
 
     <!-- Profile -->
     <string name="profile">Perfil</string>
@@ -74,6 +75,7 @@
     <string name="choose_date">Elige una fecha</string>
     <string name="toast_settings_error">Ha ocurrido un error al recuperar los parámetros de la aplicación</string>
     <string name="toast_password_change_failed">No se ha podido actualizar la contraseña</string>
+
 
 
 </resources>

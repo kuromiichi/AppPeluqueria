@@ -1,5 +1,6 @@
 package dev.kuromiichi.apppeluqueria.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,16 +14,27 @@ class RecyclerHoursAdapter(
     private val hourOnClickListener: HourOnClickListener
 ) : RecyclerView.Adapter<RecyclerHoursAdapter.ViewHolder>() {
 
+    private var selectedPosition = -1
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val binding = ItemHourBinding.bind(view)
 
         fun bind(hour: String) {
             binding.tvHour.text = hour
+            if (adapterPosition == selectedPosition) {
+                binding.cvHour.setCardBackgroundColor(Color.parseColor("#FFC107"))
+            } else {
+                binding.cvHour.setCardBackgroundColor(Color.parseColor("#B4B4B4"))
+            }
         }
 
         fun setListener(hour: String) {
             binding.root.setOnClickListener {
                 hourOnClickListener.onHourClick(hour)
+                if (selectedPosition != adapterPosition) {
+                    notifyItemChanged(selectedPosition)
+                    selectedPosition = adapterPosition
+                    notifyItemChanged(selectedPosition)
+                }
             }
         }
     }
@@ -49,4 +61,6 @@ class RecyclerHoursAdapter(
         hours = hoursNew
         notifyDataSetChanged()
     }
+
+
 }
