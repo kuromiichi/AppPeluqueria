@@ -125,7 +125,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
                     confirmAppointment()
                 }
                 setNegativeButton(R.string.dialog_no) { _, _ -> }
-            }
+            }.show()
         }
 
         binding.imageButtonCalendar.setOnClickListener {
