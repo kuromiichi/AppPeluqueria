@@ -77,6 +77,6 @@ class HomeFragment : Fragment(), AppointmentOnClickListener {
             setPositiveButton(R.string.dialog_yes) { _, _ ->
                 db.collection("appointments").document(appointment.id).delete()
             }
-        }
+        }.show()
     }
 }
