@@ -24,6 +24,8 @@ import dev.kuromiichi.apppeluqueria.databinding.FragmentAppointmentBinding
 import dev.kuromiichi.apppeluqueria.listeners.HourOnClickListener
 import dev.kuromiichi.apppeluqueria.models.Appointment
 import dev.kuromiichi.apppeluqueria.models.Service
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Calendar.HOUR_OF_DAY
@@ -45,7 +47,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
     private var selectedDate: Date? = null
     private var selectedHour: Date? = null
-    private var openDays = BooleanArray(7)
+    private var openDays = emptyList<Boolean>()
     private var availableHours = emptyList<String>()
     private var openingTime: Date? = null
     private var closingTime: Date? = null
@@ -77,7 +79,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
         db.collection("settings").document("settings").get()
             .addOnSuccessListener { result ->
                 result.data?.let {
-                    openDays = it["open_days"] as BooleanArray
+                    openDays = it["open_days"] as List<Boolean>
                     openingTime = SimpleDateFormat(
                         "HH:mm",
                         Locale.getDefault()
@@ -213,8 +215,12 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
     private fun setAvailableHours() {
         if (openingTime == null || closingTime == null) return
 
-        val calendarOpening = Calendar.getInstance().apply { time = openingTime!! }
-        val calendarClosing = Calendar.getInstance().apply { time = closingTime!! }
+        val calendarOpening = Calendar.getInstance().apply {
+            timeInMillis = selectedDate!!.time + openingTime!!.time
+        }
+        val calendarClosing = Calendar.getInstance().apply {
+            timeInMillis = selectedDate!!.time + closingTime!!.time
+        }
 
         // Ajustar inicio y fin de horas disponibles
         when (calendarOpening[MINUTE]) {
@@ -240,8 +246,9 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
         // Quitar las horas posibles que ya estén reservadas
         var occupiedHours = emptyList<Date>()
-        db.collection("appointments").get().addOnSuccessListener { result ->
-            occupiedHours = result.toObjects(Appointment::class.java)
+        runBlocking {
+            val appointments = db.collection("appointments").get().await()
+            occupiedHours = appointments.toObjects(Appointment::class.java)
                 .filter { it.date == selectedDate }
                 .groupBy { it.time }
                 .mapValues { it.value.size }
@@ -258,12 +265,15 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
         availableHours = possibleHours
             .map { SimpleDateFormat("HH:mm", Locale.getDefault()).format(it) }
+
+        println("HORAS DISPONIBLES: $availableHours")
     }
 
     private fun getFreeMinutes(date: Date, occupiedHours: List<Date>): Int {
-        val firstOccupied = occupiedHours.firstOrNull { it.after(date) } ?: closingTime
+        val firstOccupied = occupiedHours.firstOrNull { it.after(date) }
+            ?: Date(closingTime!!.time + selectedDate!!.time)
 
-        return ((firstOccupied!!.time - date.time) / 1000 / 60).toInt()
+        return ((firstOccupied.time - date.time) / 1000 / 60).toInt()
     }
 
     private fun updateRecycler() {

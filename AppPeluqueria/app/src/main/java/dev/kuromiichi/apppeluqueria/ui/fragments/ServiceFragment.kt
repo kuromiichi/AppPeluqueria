@@ -42,6 +42,7 @@ class ServiceFragment : Fragment(), ServiceOnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        selectedServices.clear()
         setRecycler()
     }
 
