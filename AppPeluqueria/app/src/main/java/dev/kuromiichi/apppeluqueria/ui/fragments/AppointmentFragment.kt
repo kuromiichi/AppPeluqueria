@@ -282,5 +282,6 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
 
     override fun onHourClick(hour: String) {
         selectedHour = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(hour)
+        binding.tilHourSelected.editText?.setText(hour)
     }
 }
