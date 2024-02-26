@@ -7,6 +7,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="@color/light"
         app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
