@@ -251,6 +251,7 @@ class AppointmentFragment : Fragment(), HourOnClickListener {
             occupiedHours = appointments.toObjects(Appointment::class.java)
                 .filter { it.date == selectedDate }
                 .groupBy { it.time }
+                .mapKeys { Date(it.key.time + selectedDate!!.time) }
                 .mapValues { it.value.size }
                 .filter { it.value >= maxAppointments }
                 .keys.toList()
